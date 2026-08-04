@@ -54,6 +54,14 @@ public:
     ITEM				Equipment[MAX_EQUIPMENT];
     DWORD				Gold;
     int                 StorageGold;
+    int                 JewelBankBless;
+    int                 JewelBankSoul;
+    int                 JewelBankLife;
+    int                 JewelBankCreation;
+    int                 JewelBankGuardian;
+    int                 JewelBankGemstone;
+    int                 JewelBankHarmony;
+    int                 JewelBankChaos;
     MONSTER             Enemy;
     //output
     WORD    AttackDamageRight;

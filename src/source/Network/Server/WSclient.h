@@ -1177,6 +1177,21 @@ typedef struct
     DWORD        Gold;
 } PRECEIVE_STORAGE_GOLD, * LPPRECEIVE_STORAGE_GOLD;
 
+//receive jewel bank update
+typedef struct
+{
+    PBMSG_HEADER Header;
+    BYTE         Success;
+    DWORD        BlessCount;
+    DWORD        SoulCount;
+    DWORD        LifeCount;
+    DWORD        CreationCount;
+    DWORD        GuardianCount;
+    DWORD        GemstoneCount;
+    DWORD        HarmonyCount;
+    DWORD        ChaosCount;
+} PRECEIVE_JEWEL_BANK_UPDATE, * LPPRECEIVE_JEWEL_BANK_UPDATE;
+
 //receive soccer time
 typedef struct {
     PBMSG_HEADER Header;

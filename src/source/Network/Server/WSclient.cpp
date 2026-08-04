@@ -7213,6 +7213,29 @@ void ReceiveStorageExit(const BYTE* ReceiveBuffer)
     g_ConsoleDebug->Write(MCD_RECEIVE, L"0x82 [ReceiveStorageExit]");
 }
 
+void ReceiveJewelBankUpdate(const BYTE* ReceiveBuffer)
+{
+    auto Data = (LPPRECEIVE_JEWEL_BANK_UPDATE)ReceiveBuffer;
+    if (Data->Success)
+    {
+        CharacterMachine->JewelBankBless = Data->BlessCount;
+        CharacterMachine->JewelBankSoul = Data->SoulCount;
+        CharacterMachine->JewelBankLife = Data->LifeCount;
+        CharacterMachine->JewelBankCreation = Data->CreationCount;
+        CharacterMachine->JewelBankGuardian = Data->GuardianCount;
+        CharacterMachine->JewelBankGemstone = Data->GemstoneCount;
+        CharacterMachine->JewelBankHarmony = Data->HarmonyCount;
+        CharacterMachine->JewelBankChaos = Data->ChaosCount;
+
+        if (g_pNewUIJewelBank != nullptr)
+        {
+            g_pNewUIJewelBank->ProcessJewelBankUpdate();
+        }
+    }
+
+    g_ConsoleDebug->Write(MCD_RECEIVE, L"0x85 [ReceiveJewelBankUpdate(%d)]", Data->Success);
+}
+
 void ReceiveStorageStatus(const BYTE* ReceiveBuffer)
 {
     auto Data = (LPPHEADER_DEFAULT)ReceiveBuffer;
@@ -13751,6 +13774,9 @@ static void ProcessPacket(const BYTE* ReceiveBuffer, int32_t Size)
         break;
     case 0x83:
         ReceiveStorageStatus(ReceiveBuffer);
+        break;
+    case 0x85:
+        ReceiveJewelBankUpdate(ReceiveBuffer);
         break;
     case 0x86:
         ReceiveMixExtended(received_span);

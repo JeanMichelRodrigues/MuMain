@@ -62,6 +62,7 @@ CNewUISystem::CNewUISystem()
     m_pNewGatemanWindow = nullptr;
     m_pNewGateSwitchWindow = nullptr;
     m_pNewStorageInventory = nullptr;
+    m_pNewUIJewelBank = nullptr;
     m_pNewStorageInventoryExt = nullptr;
     m_pNewGuildInfoWindow = nullptr;
     m_pNewMyShopInventory = nullptr;
@@ -245,6 +246,10 @@ bool CNewUISystem::LoadMainSceneInterface()
 
     m_pNewStorageInventory = new CNewUIStorageInventory;
     if (m_pNewStorageInventory->Create(m_pNewUIMng, 260, 0) == false)
+        return false;
+
+    m_pNewUIJewelBank = new CNewUIJewelBank;
+    if (m_pNewUIJewelBank->Create(m_pNewUIMng, 260, 0) == false)
         return false;
 
     m_pNewStorageInventoryExt = new CNewUIStorageInventoryExt;
@@ -552,6 +557,7 @@ void CNewUISystem::UnloadMainSceneInterface()
     SAFE_DELETE(m_pNewGuildMakeWindow);
     SAFE_DELETE(m_pNewGuildInfoWindow);
     SAFE_DELETE(m_pNewStorageInventory);
+    SAFE_DELETE(m_pNewUIJewelBank);
     SAFE_DELETE(m_pNewMixInventory);
     SAFE_DELETE(m_pNewCastleWindow);
     SAFE_DELETE(m_pNewGuardWindow);
@@ -2154,6 +2160,11 @@ CNewUIGateSwitchWindow* CNewUISystem::GetUI_NewGateSwitchWindow() const
 CNewUIStorageInventory* CNewUISystem::GetUI_NewStorageInventory() const
 {
     return m_pNewStorageInventory;
+}
+
+CNewUIJewelBank* CNewUISystem::GetUI_NewJewelBank() const
+{
+    return m_pNewUIJewelBank;
 }
 
 CNewUIStorageInventoryExt* CNewUISystem::GetUI_NewStorageInventoryExt() const

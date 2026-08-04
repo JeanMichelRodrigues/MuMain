@@ -260,6 +260,9 @@ inline SendVaultClosed dotnet_SendVaultClosed = reinterpret_cast<SendVaultClosed
 typedef void(CORECLR_DELEGATE_CALLTYPE* SendVaultMoveMoneyRequest)(int32_t, VaultMoneyMoveDirection , uint32_t );
 inline SendVaultMoveMoneyRequest dotnet_SendVaultMoveMoneyRequest = reinterpret_cast<SendVaultMoveMoneyRequest>(symLoad(munique_client_library_handle, "SendVaultMoveMoneyRequest"));
 
+typedef void(CORECLR_DELEGATE_CALLTYPE* SendJewelBankMoveRequest)(int32_t, JewelBankMoveDirection , JewelBankJewelType , uint32_t );
+inline SendJewelBankMoveRequest dotnet_SendJewelBankMoveRequest = reinterpret_cast<SendJewelBankMoveRequest>(symLoad(munique_client_library_handle, "SendJewelBankMoveRequest"));
+
 typedef void(CORECLR_DELEGATE_CALLTYPE* SendLahapJewelMixRequest)(int32_t, MixType , ItemType , StackSize , BYTE );
 inline SendLahapJewelMixRequest dotnet_SendLahapJewelMixRequest = reinterpret_cast<SendLahapJewelMixRequest>(symLoad(munique_client_library_handle, "SendLahapJewelMixRequest"));
 
@@ -592,3 +595,6 @@ inline SendDuelChannelJoinRequest dotnet_SendDuelChannelJoinRequest = reinterpre
 
 typedef void(CORECLR_DELEGATE_CALLTYPE* SendDuelChannelQuitRequest)(int32_t);
 inline SendDuelChannelQuitRequest dotnet_SendDuelChannelQuitRequest = reinterpret_cast<SendDuelChannelQuitRequest>(symLoad(munique_client_library_handle, "SendDuelChannelQuitRequest"));
+
+typedef void(CORECLR_DELEGATE_CALLTYPE* SendChatCommandListRequest)(int32_t);
+inline SendChatCommandListRequest dotnet_SendChatCommandListRequest = reinterpret_cast<SendChatCommandListRequest>(symLoad(munique_client_library_handle, "SendChatCommandListRequest"));

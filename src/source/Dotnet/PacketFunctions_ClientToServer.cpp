@@ -418,6 +418,11 @@ void PacketFunctions_ClientToServer::SendVaultMoveMoneyRequest(VaultMoneyMoveDir
     dotnet_SendVaultMoveMoneyRequest(this->GetHandle(), direction, amount);
 }
 
+void PacketFunctions_ClientToServer::SendJewelBankMoveRequest(JewelBankMoveDirection direction, JewelBankJewelType jewelType, uint32_t amount)
+{
+    dotnet_SendJewelBankMoveRequest(this->GetHandle(), direction, jewelType, amount);
+}
+
 void PacketFunctions_ClientToServer::SendLahapJewelMixRequest(MixType operation, ItemType item, StackSize mixingStackSize, BYTE unmixingSourceSlot)
 {
     dotnet_SendLahapJewelMixRequest(this->GetHandle(), operation, item, mixingStackSize, unmixingSourceSlot);
@@ -971,4 +976,9 @@ void PacketFunctions_ClientToServer::SendDuelChannelJoinRequest(BYTE channelId)
 void PacketFunctions_ClientToServer::SendDuelChannelQuitRequest()
 {
     dotnet_SendDuelChannelQuitRequest(this->GetHandle());
+}
+
+void PacketFunctions_ClientToServer::SendChatCommandListRequest()
+{
+    dotnet_SendChatCommandListRequest(this->GetHandle());
 }

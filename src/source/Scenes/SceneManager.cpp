@@ -333,6 +333,22 @@ static void UpdateCoreSystems()
 }
 
 /**
+ * @brief F12 toggles the simple FPS counter overlay, mirroring the
+ * "$fpscounter on/off" chat command without requiring the chat box.
+ */
+static void HandleFpsCounterHotkey()
+{
+    static bool s_bF12KeyPressed = false;
+
+    const bool bF12Down = Core::Input::IsKeyDown(VK_F12);
+    if (bF12Down && !s_bF12KeyPressed)
+    {
+        SetShowFpsCounter(!g_bShowFpsCounter);
+    }
+    s_bF12KeyPressed = bF12Down;
+}
+
+/**
  * @brief Sets both the OpenGL clear color and the global fog color to the same RGB.
  *
  * Every world uses the fog color as its clear color, so this keeps them in sync
@@ -1006,6 +1022,7 @@ void MainScene(HDC hDC)
     }
 
     UpdateCoreSystems();
+    HandleFpsCounterHotkey();
     SetWorldClearColor();
 
     bool Success = false;

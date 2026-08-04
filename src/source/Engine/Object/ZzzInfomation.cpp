@@ -2492,6 +2492,14 @@ void CHARACTER_MACHINE::Init()
     }
     Gold = 0;
     StorageGold = 0;
+    JewelBankBless = 0;
+    JewelBankSoul = 0;
+    JewelBankLife = 0;
+    JewelBankCreation = 0;
+    JewelBankGuardian = 0;
+    JewelBankGemstone = 0;
+    JewelBankHarmony = 0;
+    JewelBankChaos = 0;
     PacketSerial = 0;
     InfinityArrowAdditionalMana = 0;
 }

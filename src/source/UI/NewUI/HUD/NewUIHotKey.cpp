@@ -271,6 +271,13 @@ bool SEASON3B::CNewUIHotKey::UpdateKeyEvent()
 
         return false;
     }
+    else if (SEASON3B::IsPress('J') == true)
+    {
+        g_pNewUISystem->Toggle(SEASON3B::INTERFACE_JEWELBANK);
+        PlayBuffer(SOUND_CLICK01);
+
+        return false;
+    }
     else if (SEASON3B::IsPress(VK_TAB) == true && gMapManager.InBattleCastle() == true)
     {
         g_pNewUISystem->Toggle(SEASON3B::INTERFACE_SIEGEWARFARE);

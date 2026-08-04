@@ -79,6 +79,24 @@ InventoryToVault = 0, ///< The money is moved from the inventory to the vault.
 VaultToInventory = 1, ///< The money is moved from the vault to the inventory.
 };
 
+enum class JewelBankMoveDirection : uint32_t
+{
+DepositToBank = 0, ///< The jewels are moved from the inventory to the jewel bank.
+WithdrawToInventory = 1, ///< The jewels are moved from the jewel bank to the inventory.
+};
+
+enum class JewelBankJewelType : uint32_t
+{
+JewelOfBless = 0, ///< The Jewel of Bless.
+JewelOfSoul = 1, ///< The Jewel of Soul.
+JewelOfLife = 2, ///< The Jewel of Life.
+JewelOfCreation = 3, ///< The Jewel of Creation.
+JewelOfGuardian = 4, ///< The Jewel of Guardian.
+Gemstone = 5, ///< The Gemstone.
+JewelOfHarmony = 6, ///< The Jewel of Harmony.
+JewelOfChaos = 7, ///< The Jewel of Chaos.
+};
+
 enum class MixType : uint32_t
 {
 Mix = 0, ///< The player wants to mix single jewels into a bundle.
