@@ -5,12 +5,13 @@
 
 #include "UI/NewUI/NewUIBase.h"
 #include "UI/NewUI/NewUIManager.h"
+#include "UI/NewUI/NewUI3DRenderMng.h"
 #include "UI/NewUI/Inventory/NewUIMyInventory.h"
 #include "UI/NewUI/Widgets/NewUIButton.h"
 
 namespace SEASON3B
 {
-    class CNewUIJewelBank : public CNewUIObj
+    class CNewUIJewelBank : public CNewUIObj, public INewUI3DRenderObj
     {
     public:
         enum IMAGE_LIST
@@ -22,15 +23,14 @@ namespace SEASON3B
             IMAGE_JEWELBANK_BOTTOM = CNewUIMyInventory::IMAGE_INVENTORY_BACK_BOTTOM,
             IMAGE_JEWELBANK_BTN_EXIT = CNewUIMyInventory::IMAGE_INVENTORY_EXIT_BTN,
 
-            IMAGE_JEWELBANK_BTN_UP = BITMAP_INTERFACE_NEW_STORAGE_BEGIN,
-            IMAGE_JEWELBANK_BTN_DOWN = BITMAP_INTERFACE_NEW_STORAGE_BEGIN + 1,
+            IMAGE_JEWELBANK_BTN_EMPTY = CNewUIMessageBoxMng::IMAGE_MSGBOX_BTN_EMPTY,
         };
 
         enum { JEWEL_TYPE_COUNT = 8 };
 
     private:
         static constexpr float JEWELBANK_WIDTH = 190.0f;
-        static constexpr float JEWELBANK_HEIGHT = 325.0f;
+        static constexpr float JEWELBANK_HEIGHT = 330.0f;
 
         enum VIEW_STATE
         {
@@ -61,6 +61,7 @@ namespace SEASON3B
 
         VIEW_STATE          m_eView;
         int                 m_iSelectedJewelIndex;
+        bool                m_bWasVisible;
 
     public:
         CNewUIJewelBank();
@@ -75,6 +76,8 @@ namespace SEASON3B
         bool UpdateKeyEvent();
         bool Update();
         bool Render();
+        void Render3D();
+        bool IsVisible() const override;
 
         float GetLayerDepth();
 
@@ -85,6 +88,8 @@ namespace SEASON3B
         void UnloadImages();
 
         void InitButtons();
+        void InitActionButton(CNewUIButton& btn, const wchar_t* pszLabel);
+        void RenderActionButtonBox(CNewUIButton& btn);
 
         void RenderListView();
         void RenderDetailView();

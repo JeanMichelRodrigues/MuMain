@@ -25,6 +25,7 @@ CNewUIJewelBank::CNewUIJewelBank()
     m_Pos.x = m_Pos.y = 0;
     m_eView = VIEW_LIST;
     m_iSelectedJewelIndex = 0;
+    m_bWasVisible = false;
 }
 
 CNewUIJewelBank::~CNewUIJewelBank()
@@ -39,6 +40,7 @@ bool CNewUIJewelBank::Create(CNewUIManager* pNewUIMng, int x, int y)
 
     m_pNewUIMng = pNewUIMng;
     m_pNewUIMng->AddUIObj(INTERFACE_JEWELBANK, this);
+    g_pNewUI3DRenderMng->Add3DRenderObj(this, INFORMATION_CAMERA_Z_ORDER);
 
     SetPos(x, y);
 
@@ -53,6 +55,8 @@ bool CNewUIJewelBank::Create(CNewUIManager* pNewUIMng, int x, int y)
 void CNewUIJewelBank::Release()
 {
     UnloadImages();
+
+    g_pNewUI3DRenderMng->Remove3DRenderObj(this);
 
     if (m_pNewUIMng)
     {
@@ -76,17 +80,50 @@ void CNewUIJewelBank::InitButtons()
         L"30 un",
         L"30 pack",
         L"Sacar Max",
-        L"Depositar Tudo",
+        L"Depositar",
         L"Cancelar",
     };
 
     for (int i = 0; i < MAX_ACTION_BTN; ++i)
     {
-        m_aActionBtn[i].ChangeButtonImgState(true, IMAGE_JEWELBANK_BTN_UP, false, false);
-        m_aActionBtn[i].ChangeText(aszLabels[i]);
-        m_aActionBtn[i].SetFont(g_hFont);
-        m_aActionBtn[i].ChangeTextColor(RGBA(255, 255, 255, 255));
+        InitActionButton(m_aActionBtn[i], aszLabels[i]);
     }
+}
+
+void CNewUIJewelBank::InitActionButton(CNewUIButton& btn, const wchar_t* pszLabel)
+{
+    btn.ChangeText(pszLabel);
+    btn.SetFont(g_hFont);
+    btn.ChangeTextColor(RGBA(255, 255, 255, 255));
+}
+
+void CNewUIJewelBank::RenderActionButtonBox(CNewUIButton& btn)
+{
+    const POINT& pos = btn.GetPos();
+    const POINT& size = btn.GetSize();
+    bool bHover = (btn.GetBTState() != BUTTON_STATE_UP);
+
+    // RenderColor()'s texture-disable is skipped whenever the renderer's
+    // cached "texture enabled" flag is already out of sync with the real GL
+    // state (e.g. after a RenderText() call, which re-enables texturing
+    // without updating that cache) — rebinding a real texture immediately
+    // before each RenderColor() forces the cache back in sync first.
+    BindTexture(IMAGE_JEWELBANK_BACK);
+    glColor4f(0.12f, 0.12f, 0.14f, 1.f);
+    RenderColor(float(pos.x), float(pos.y), float(size.x), float(size.y));
+    EndRenderColor();
+
+    BindTexture(IMAGE_JEWELBANK_BACK);
+
+    if (bHover)
+    {
+        glColor4f(0.2f, 0.55f, 0.75f, 0.6f);
+        RenderColor(float(pos.x), float(pos.y), float(size.x), float(size.y));
+        EndRenderColor();
+        BindTexture(IMAGE_JEWELBANK_BACK);
+    }
+
+    BindTexture(IMAGE_JEWELBANK_BACK);
 }
 
 void CNewUIJewelBank::SetPos(int x, int y)
@@ -96,15 +133,16 @@ void CNewUIJewelBank::SetPos(int x, int y)
 
     m_BtnExit.ChangeButtonInfo(m_Pos.x + 13, m_Pos.y + int(JEWELBANK_HEIGHT) - 37, 36, 29);
 
-    constexpr int iBtnWidth = 83;
-    constexpr int iBtnHeight = 20;
-    constexpr int iBtnGap = 4;
-    int iStartY = m_Pos.y + 70;
+    constexpr int iFullWidth = 170;
+    constexpr int iHalfWidth = 83;
+    constexpr int iBtnHeight = 22;
+    constexpr int iBtnGap = 3;
+    int iStartY = m_Pos.y + 100;
 
-    // Rows 0-2: paired withdraw buttons (1 alone, then 10/10pack, 20/20pack, 30/30pack).
-    m_aActionBtn[BTN_WITHDRAW_1].ChangeButtonInfo(m_Pos.x + JEWELBANK_ROW_X, iStartY, iBtnWidth, iBtnHeight);
+    // Row 0: Sacar 1 (full width).
+    m_aActionBtn[BTN_WITHDRAW_1].ChangeButtonInfo(m_Pos.x + JEWELBANK_ROW_X, iStartY, iFullWidth, iBtnHeight);
 
-    int iPairStartY = iStartY + (iBtnHeight + iBtnGap);
+    // Rows 1-3: paired withdraw buttons (10un/10pack, 20un/20pack, 30un/30pack).
     const ACTION_BUTTON aPairs[3][2] =
     {
         { BTN_WITHDRAW_10, BTN_WITHDRAW_10PACK },
@@ -113,13 +151,13 @@ void CNewUIJewelBank::SetPos(int x, int y)
     };
     for (int iRow = 0; iRow < 3; ++iRow)
     {
-        int iY = iPairStartY + iRow * (iBtnHeight + iBtnGap);
-        m_aActionBtn[aPairs[iRow][0]].ChangeButtonInfo(m_Pos.x + JEWELBANK_ROW_X, iY, iBtnWidth, iBtnHeight);
-        m_aActionBtn[aPairs[iRow][1]].ChangeButtonInfo(m_Pos.x + JEWELBANK_ROW_X + iBtnWidth + iBtnGap, iY, iBtnWidth, iBtnHeight);
+        int iY = iStartY + (iRow + 1) * (iBtnHeight + iBtnGap);
+        m_aActionBtn[aPairs[iRow][0]].ChangeButtonInfo(m_Pos.x + JEWELBANK_ROW_X, iY, iHalfWidth, iBtnHeight);
+        m_aActionBtn[aPairs[iRow][1]].ChangeButtonInfo(m_Pos.x + JEWELBANK_ROW_X + iHalfWidth + iBtnGap, iY, iHalfWidth, iBtnHeight);
     }
 
-    int iFullWidth = iBtnWidth * 2 + iBtnGap;
-    int iFullStartY = iPairStartY + 3 * (iBtnHeight + iBtnGap) + 4;
+    // Rows 4-6: Sacar Max, Depositar Tudo, Cancelar (full width).
+    int iFullStartY = iStartY + 4 * (iBtnHeight + iBtnGap);
     m_aActionBtn[BTN_WITHDRAW_MAX].ChangeButtonInfo(m_Pos.x + JEWELBANK_ROW_X, iFullStartY, iFullWidth, iBtnHeight);
     m_aActionBtn[BTN_DEPOSIT_ALL].ChangeButtonInfo(m_Pos.x + JEWELBANK_ROW_X, iFullStartY + (iBtnHeight + iBtnGap), iFullWidth, iBtnHeight);
     m_aActionBtn[BTN_CANCEL].ChangeButtonInfo(m_Pos.x + JEWELBANK_ROW_X, iFullStartY + 2 * (iBtnHeight + iBtnGap), iFullWidth, iBtnHeight);
@@ -196,6 +234,10 @@ bool CNewUIJewelBank::ProcessDetailViewBtns()
         {
             SendWithdrawRequest(iMax);
         }
+        else
+        {
+            PlayBuffer(SOUND_ERROR01);
+        }
         return true;
     }
 
@@ -252,6 +294,13 @@ bool CNewUIJewelBank::UpdateKeyEvent()
 
 bool CNewUIJewelBank::Update()
 {
+    bool bVisibleNow = IsVisible();
+    if (!bVisibleNow && m_bWasVisible)
+    {
+        m_eView = VIEW_LIST;
+    }
+    m_bWasVisible = bVisibleNow;
+
     return true;
 }
 
@@ -308,23 +357,41 @@ void CNewUIJewelBank::RenderJewelRow(int iIndex)
     int iPosY = m_Pos.y + JEWELBANK_ROW_START_Y + iIndex * JEWELBANK_ROW_HEIGHT;
     int iRowHeight = JEWELBANK_ROW_HEIGHT - 2;
 
-    glColor4f(0.f, 0.f, 0.f, 0.5f);
+    bool bHover = CheckMouseIn(iPosX, iPosY, JEWELBANK_ROW_WIDTH, iRowHeight);
+
+    // RenderColor()'s texture-disable is skipped whenever the renderer's
+    // cached "texture enabled" flag is already out of sync with the real GL
+    // state (e.g. after a RenderText() call, which re-enables texturing
+    // without updating that cache) — rebinding a real texture immediately
+    // before each RenderColor() forces the cache back in sync first.
+    BindTexture(IMAGE_JEWELBANK_BACK);
+    glColor4f(0.f, 0.f, 0.f, 1.f);
     RenderColor(float(iPosX), float(iPosY), float(JEWELBANK_ROW_WIDTH), float(iRowHeight));
     EndRenderColor();
 
-    glColor4f(1.f, 1.f, 1.f, 1.f);
-    RenderItem3D(float(iPosX + 2), float(iPosY + 2), 24.f, 24.f, GetJewelItemType(iIndex), 0, 0, 0, false);
+    BindTexture(IMAGE_JEWELBANK_BACK);
+
+    if (bHover)
+    {
+        glColor4f(0.2f, 0.55f, 0.75f, 0.6f);
+        RenderColor(float(iPosX), float(iPosY), float(JEWELBANK_ROW_WIDTH), float(iRowHeight));
+        EndRenderColor();
+        BindTexture(IMAGE_JEWELBANK_BACK);
+    }
 
     wchar_t szBalance[32] = { 0, };
     mu_swprintf(szBalance, L"x%06d", GetJewelBalance(iIndex));
 
     g_pRenderText->SetFont(g_hFont);
+
+    glColor4f(1.f, 1.f, 1.f, 1.f);
     g_pRenderText->SetTextColor(RGBA(255, 255, 255, 255));
 
     const wchar_t* const* pNameSlot = GetJewelNameSlot(iIndex);
     const wchar_t* pszName = (pNameSlot != nullptr) ? *pNameSlot : L"Gemstone";
     g_pRenderText->RenderText(iPosX + 32, iPosY + 7, pszName, JEWELBANK_ROW_WIDTH - 90, 0, RT3_SORT_LEFT);
 
+    glColor4f(1.f, 1.f, 1.f, 1.f);
     g_pRenderText->SetTextColor(RGBA(255, 215, 0, 255));
     g_pRenderText->RenderText(iPosX + JEWELBANK_ROW_WIDTH - 60, iPosY + 7, szBalance, 55, 0, RT3_SORT_RIGHT);
 }
@@ -332,9 +399,6 @@ void CNewUIJewelBank::RenderJewelRow(int iIndex)
 void CNewUIJewelBank::RenderDetailView()
 {
     int iCenterX = m_Pos.x + int(JEWELBANK_WIDTH / 2);
-
-    glColor4f(1.f, 1.f, 1.f, 1.f);
-    RenderItem3D(float(iCenterX - 17), float(m_Pos.y + 34), 34.f, 34.f, GetJewelItemType(m_iSelectedJewelIndex), 0, 0, 0, false);
 
     wchar_t szBalance[64] = { 0, };
     mu_swprintf(szBalance, L"%d x ", GetJewelBalance(m_iSelectedJewelIndex));
@@ -346,8 +410,14 @@ void CNewUIJewelBank::RenderDetailView()
     mu_swprintf(szFull, L"%s%s", szBalance, pszName);
 
     g_pRenderText->SetFont(g_hFontBold);
+    glColor4f(1.f, 1.f, 1.f, 1.f);
     g_pRenderText->SetTextColor(RGBA(0, 255, 0, 255));
     g_pRenderText->RenderText(m_Pos.x + int(JEWELBANK_WIDTH / 2) - 60, m_Pos.y + 72, szFull, 120, 0, RT3_SORT_CENTER);
+
+    for (int i = 0; i < MAX_ACTION_BTN; ++i)
+    {
+        RenderActionButtonBox(m_aActionBtn[i]);
+    }
 
     for (int i = 0; i < MAX_ACTION_BTN; ++i)
     {
@@ -358,6 +428,31 @@ void CNewUIJewelBank::RenderDetailView()
 float CNewUIJewelBank::GetLayerDepth()
 {
     return 2.4f;
+}
+
+bool CNewUIJewelBank::IsVisible() const
+{
+    return CNewUIObj::IsVisible();
+}
+
+void CNewUIJewelBank::Render3D()
+{
+    glColor4f(1.f, 1.f, 1.f, 1.f);
+
+    if (m_eView == VIEW_LIST)
+    {
+        for (int i = 0; i < JEWEL_TYPE_COUNT; ++i)
+        {
+            int iPosX = m_Pos.x + JEWELBANK_ROW_X;
+            int iPosY = m_Pos.y + JEWELBANK_ROW_START_Y + i * JEWELBANK_ROW_HEIGHT;
+            RenderItem3D(float(iPosX + 2), float(iPosY + 2), 24.f, 24.f, GetJewelItemType(i), 0, 0, 0, false);
+        }
+    }
+    else
+    {
+        int iCenterX = m_Pos.x + int(JEWELBANK_WIDTH / 2);
+        RenderItem3D(float(iCenterX - 17), float(m_Pos.y + 34), 34.f, 34.f, GetJewelItemType(m_iSelectedJewelIndex), 0, 0, 0, false);
+    }
 }
 
 void CNewUIJewelBank::ProcessJewelBankUpdate()
@@ -456,16 +551,10 @@ void CNewUIJewelBank::LoadImages()
     LoadBitmap(L"Interface\\newui_item_back02-R.tga", IMAGE_JEWELBANK_RIGHT, GL_LINEAR);
     LoadBitmap(L"Interface\\newui_item_back03.tga", IMAGE_JEWELBANK_BOTTOM, GL_LINEAR);
     LoadBitmap(L"Interface\\newui_exit_00.tga", IMAGE_JEWELBANK_BTN_EXIT, GL_LINEAR);
-
-    LoadBitmap(L"Interface\\newui_Bt_money01.tga", IMAGE_JEWELBANK_BTN_UP, GL_LINEAR);
-    LoadBitmap(L"Interface\\newui_Bt_money02.tga", IMAGE_JEWELBANK_BTN_DOWN, GL_LINEAR);
 }
 
 void CNewUIJewelBank::UnloadImages()
 {
-    DeleteBitmap(IMAGE_JEWELBANK_BTN_DOWN);
-    DeleteBitmap(IMAGE_JEWELBANK_BTN_UP);
-
     DeleteBitmap(IMAGE_JEWELBANK_BTN_EXIT);
     DeleteBitmap(IMAGE_JEWELBANK_BOTTOM);
     DeleteBitmap(IMAGE_JEWELBANK_RIGHT);
