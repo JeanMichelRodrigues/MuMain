@@ -418,9 +418,9 @@ void PacketFunctions_ClientToServer::SendVaultMoveMoneyRequest(VaultMoneyMoveDir
     dotnet_SendVaultMoveMoneyRequest(this->GetHandle(), direction, amount);
 }
 
-void PacketFunctions_ClientToServer::SendJewelBankMoveRequest(JewelBankMoveDirection direction, JewelBankJewelType jewelType, uint32_t amount)
+void PacketFunctions_ClientToServer::SendJewelBankMoveRequest(JewelBankMoveDirection direction, JewelBankJewelType jewelType, uint32_t amount, BYTE asPack)
 {
-    dotnet_SendJewelBankMoveRequest(this->GetHandle(), direction, jewelType, amount);
+    dotnet_SendJewelBankMoveRequest(this->GetHandle(), direction, jewelType, amount, asPack);
 }
 
 void PacketFunctions_ClientToServer::SendLahapJewelMixRequest(MixType operation, ItemType item, StackSize mixingStackSize, BYTE unmixingSourceSlot)

@@ -102,7 +102,7 @@ namespace SEASON3B
         int GetJewelItemType(int iIndex) const;
         const wchar_t* const* GetJewelNameSlot(int iIndex) const;
 
-        void SendWithdrawRequest(int iAmount);
+        void SendWithdrawRequest(int iAmount, bool bAsPack = false);
         void SendDepositAllRequest();
     };
 }

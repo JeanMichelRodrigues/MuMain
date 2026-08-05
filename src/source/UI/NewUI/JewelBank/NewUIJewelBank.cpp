@@ -209,21 +209,39 @@ bool CNewUIJewelBank::ProcessDetailViewBtns()
         return true;
     }
 
-    if (m_aActionBtn[BTN_WITHDRAW_10].UpdateMouseEvent() || m_aActionBtn[BTN_WITHDRAW_10PACK].UpdateMouseEvent())
+    if (m_aActionBtn[BTN_WITHDRAW_10].UpdateMouseEvent())
     {
-        SendWithdrawRequest(10);
+        SendWithdrawRequest(10, false);
         return true;
     }
 
-    if (m_aActionBtn[BTN_WITHDRAW_20].UpdateMouseEvent() || m_aActionBtn[BTN_WITHDRAW_20PACK].UpdateMouseEvent())
+    if (m_aActionBtn[BTN_WITHDRAW_10PACK].UpdateMouseEvent())
     {
-        SendWithdrawRequest(20);
+        SendWithdrawRequest(10, true);
         return true;
     }
 
-    if (m_aActionBtn[BTN_WITHDRAW_30].UpdateMouseEvent() || m_aActionBtn[BTN_WITHDRAW_30PACK].UpdateMouseEvent())
+    if (m_aActionBtn[BTN_WITHDRAW_20].UpdateMouseEvent())
     {
-        SendWithdrawRequest(30);
+        SendWithdrawRequest(20, false);
+        return true;
+    }
+
+    if (m_aActionBtn[BTN_WITHDRAW_20PACK].UpdateMouseEvent())
+    {
+        SendWithdrawRequest(20, true);
+        return true;
+    }
+
+    if (m_aActionBtn[BTN_WITHDRAW_30].UpdateMouseEvent())
+    {
+        SendWithdrawRequest(30, false);
+        return true;
+    }
+
+    if (m_aActionBtn[BTN_WITHDRAW_30PACK].UpdateMouseEvent())
+    {
+        SendWithdrawRequest(30, true);
         return true;
     }
 
@@ -510,7 +528,7 @@ const wchar_t* const* CNewUIJewelBank::GetJewelNameSlot(int iIndex) const
     }
 }
 
-void CNewUIJewelBank::SendWithdrawRequest(int iAmount)
+void CNewUIJewelBank::SendWithdrawRequest(int iAmount, bool bAsPack)
 {
     if (iAmount <= 0)
         return;
@@ -522,7 +540,8 @@ void CNewUIJewelBank::SendWithdrawRequest(int iAmount)
     SocketClient->ToGameServer()->SendJewelBankMoveRequest(
         JewelBankMoveDirection::WithdrawToInventory,
         static_cast<JewelBankJewelType>(m_iSelectedJewelIndex),
-        static_cast<uint32_t>(iAmount));
+        static_cast<uint32_t>(iAmount),
+        static_cast<BYTE>(bAsPack ? 1 : 0));
 
     PlayBuffer(SOUND_CLICK01);
 }
@@ -538,7 +557,8 @@ void CNewUIJewelBank::SendDepositAllRequest()
     SocketClient->ToGameServer()->SendJewelBankMoveRequest(
         JewelBankMoveDirection::DepositToBank,
         static_cast<JewelBankJewelType>(m_iSelectedJewelIndex),
-        DEPOSIT_ALL_AMOUNT);
+        DEPOSIT_ALL_AMOUNT,
+        0);
 
     PlayBuffer(SOUND_CLICK01);
 }

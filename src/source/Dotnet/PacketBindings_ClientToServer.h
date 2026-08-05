@@ -260,7 +260,7 @@ inline SendVaultClosed dotnet_SendVaultClosed = reinterpret_cast<SendVaultClosed
 typedef void(CORECLR_DELEGATE_CALLTYPE* SendVaultMoveMoneyRequest)(int32_t, VaultMoneyMoveDirection , uint32_t );
 inline SendVaultMoveMoneyRequest dotnet_SendVaultMoveMoneyRequest = reinterpret_cast<SendVaultMoveMoneyRequest>(symLoad(munique_client_library_handle, "SendVaultMoveMoneyRequest"));
 
-typedef void(CORECLR_DELEGATE_CALLTYPE* SendJewelBankMoveRequest)(int32_t, JewelBankMoveDirection , JewelBankJewelType , uint32_t );
+typedef void(CORECLR_DELEGATE_CALLTYPE* SendJewelBankMoveRequest)(int32_t, JewelBankMoveDirection , JewelBankJewelType , uint32_t , BYTE );
 inline SendJewelBankMoveRequest dotnet_SendJewelBankMoveRequest = reinterpret_cast<SendJewelBankMoveRequest>(symLoad(munique_client_library_handle, "SendJewelBankMoveRequest"));
 
 typedef void(CORECLR_DELEGATE_CALLTYPE* SendLahapJewelMixRequest)(int32_t, MixType , ItemType , StackSize , BYTE );

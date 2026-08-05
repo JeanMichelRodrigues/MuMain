@@ -2863,12 +2863,13 @@ public unsafe partial class ConnectionManager
     /// <param name="direction">The direction.</param>
     /// <param name="jewelType">The jewel type.</param>
     /// <param name="amount">The amount.</param>
+    /// <param name="asPack">If true, and the amount is a valid stack size (10, 20 or 30), the withdrawn jewels are combined into a single packed jewel item instead of being withdrawn as separate items.</param>
     /// <remarks>
     /// Is sent by the client when: The player wants to deposit jewels into, or withdraw jewels from, the account-wide jewel bank.
     /// Causes reaction on server side: The jewels are moved between the inventory and the jewel bank balance, if possible.
     /// </remarks>
     [UnmanagedCallersOnly(EntryPoint = "SendJewelBankMoveRequest")]
-    public static void SendJewelBankMoveRequest(int handle, JewelBankMoveRequest.JewelBankMoveDirection @direction, JewelBankMoveRequest.JewelBankJewelType @jewelType, uint @amount)
+    public static void SendJewelBankMoveRequest(int handle, JewelBankMoveRequest.JewelBankMoveDirection @direction, JewelBankMoveRequest.JewelBankJewelType @jewelType, uint @amount, byte @asPack)
     {
         if (!Connections.TryGetValue(handle, out var connection))
         {
@@ -2884,6 +2885,7 @@ public unsafe partial class ConnectionManager
                 packet.Direction = @direction;
                 packet.JewelType = @jewelType;
                 packet.Amount = @amount;
+                packet.AsPack = @asPack == 1;
 
                 return length;
             });
