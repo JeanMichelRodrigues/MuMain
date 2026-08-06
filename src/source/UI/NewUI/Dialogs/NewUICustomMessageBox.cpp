@@ -4466,6 +4466,64 @@ CALLBACK_RESULT SEASON3B::CTradeZenMsgBoxLayout::CancelBtnDown(class CNewUIMessa
     return CALLBACK_BREAK;
 }
 
+bool SEASON3B::CDivideItemMsgBoxLayout::SetLayout()
+{
+    CNewUITextInputMsgBox* pMsgBox = GetMsgBox();
+    if (0 == pMsgBox)
+        return false;
+
+    if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL, INPUTBOX_TYPE_NUMBER, INPUTBOX_WIDTH, INPUTBOX_HEIGHT, INPUTBOX_TEXTLIMIT))
+        return false;
+
+    pMsgBox->SetInputBoxOption(UIOPTION_NUMBERONLY | UIOPTION_PAINTBACK);
+    pMsgBox->AddMsg(L"You can divide an item by a desired number.");
+    pMsgBox->AddCallbackFunc(CDivideItemMsgBoxLayout::ReturnDown, MSGBOX_EVENT_PRESSKEY_RETURN);
+    pMsgBox->AddCallbackFunc(CDivideItemMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
+    pMsgBox->AddCallbackFunc(CDivideItemMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
+
+    pMsgBox->AddCallbackFunc(CDivideItemMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_PRESSKEY_ESC);
+    return true;
+}
+
+CALLBACK_RESULT SEASON3B::CDivideItemMsgBoxLayout::ProcessOk(class CNewUIMessageBoxBase* pOwner)
+{
+    auto* pMsgBox = dynamic_cast<CNewUITextInputMsgBox*>(pOwner);
+    wchar_t strText[MAX_TEXT_LENGTH] = { 0, };
+    pMsgBox->GetInputBoxText(strText);
+    if (wcslen(strText) == 0)
+        return CALLBACK_CONTINUE;
+
+    int iAmount = _wtoi(strText);
+    ITEM* pItem = g_pMyInventory->FindItem(CNewUIInventoryCtrl::s_iDivideItemIndex);
+    if (iAmount <= 0 || pItem == nullptr)
+        return CALLBACK_CONTINUE;
+
+    SocketClient->ToGameServer()->SendDivideItemRequest((BYTE)CNewUIInventoryCtrl::s_iDivideItemIndex, (BYTE)iAmount);
+
+    PlayBuffer(SOUND_CLICK01);
+    g_MessageBox->SendEvent(pOwner, MSGBOX_EVENT_DESTROY);
+
+    return CALLBACK_BREAK;
+}
+
+CALLBACK_RESULT SEASON3B::CDivideItemMsgBoxLayout::ReturnDown(class CNewUIMessageBoxBase* pOwner, const leaf::xstreambuf& xParam)
+{
+    return ProcessOk(pOwner);
+}
+
+CALLBACK_RESULT SEASON3B::CDivideItemMsgBoxLayout::OkBtnDown(class CNewUIMessageBoxBase* pOwner, const leaf::xstreambuf& xParam)
+{
+    return ProcessOk(pOwner);
+}
+
+CALLBACK_RESULT SEASON3B::CDivideItemMsgBoxLayout::CancelBtnDown(class CNewUIMessageBoxBase* pOwner, const leaf::xstreambuf& xParam)
+{
+    PlayBuffer(SOUND_CLICK01);
+    g_MessageBox->SendEvent(pOwner, MSGBOX_EVENT_DESTROY);
+
+    return CALLBACK_BREAK;
+}
+
 bool SEASON3B::CZenReceiptMsgBoxLayout::SetLayout()
 {
     CNewUITextInputMsgBox* pMsgBox = GetMsgBox();

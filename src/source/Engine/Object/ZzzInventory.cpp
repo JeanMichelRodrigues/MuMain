@@ -2609,6 +2609,14 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         else
             mu_swprintf(TextList[TextNum], L"%ls +%d", p->Name, Level);
     }
+    else if (ip->Type == ITEM_PACKED_JEWEL_OF_BLESS || ip->Type == ITEM_PACKED_JEWEL_OF_SOUL
+        || ip->Type == ITEM_PACKED_JEWEL_OF_LIFE || ip->Type == ITEM_PACKED_JEWEL_OF_CREATION
+        || ip->Type == ITEM_PACKED_JEWEL_OF_GUARDIAN || ip->Type == ITEM_PACKED_GEMSTONE
+        || ip->Type == ITEM_PACKED_JEWEL_OF_HARMONY || ip->Type == ITEM_PACKED_JEWEL_OF_CHAOS
+        || ip->Type == ITEM_PACKED_LOWER_REFINE_STONE || ip->Type == ITEM_PACKED_HIGHER_REFINE_STONE)
+    {
+        mu_swprintf(TextList[TextNum], L"%ls", p->Name);
+    }
     else if (nGemType != COMGEM::NOGEM && nGemType % 2 == 1)
     {
         int nGlobalIndex = COMGEM::GetJewelIndex(nGemType, COMGEM::eGEM_NAME);
@@ -2844,6 +2852,13 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
     else if (ip->Type == ITEM_POTION + 53)
     {
         mu_swprintf(TextList[TextNum], I18N::Game::IncreasesTheCombinationRateButOnlyUpToTheMaximumRate);
+        TextListColor[TextNum] = TEXT_COLOR_BLUE;
+        TextBold[TextNum] = false;
+        TextNum++;
+    }
+    else if (ip->Type == ITEM_BLESS_OF_LIGHT)
+    {
+        mu_swprintf(TextList[TextNum], L"EXP Gain increase 100%%");
         TextListColor[TextNum] = TEXT_COLOR_BLUE;
         TextBold[TextNum] = false;
         TextNum++;
@@ -4201,7 +4216,19 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         }
     }
     char tCount = COMGEM::CalcCompiledCount(ip);
-    if (tCount > 0)
+    if (ip->Type == ITEM_PACKED_JEWEL_OF_BLESS || ip->Type == ITEM_PACKED_JEWEL_OF_SOUL
+        || ip->Type == ITEM_PACKED_JEWEL_OF_LIFE || ip->Type == ITEM_PACKED_JEWEL_OF_CREATION
+        || ip->Type == ITEM_PACKED_JEWEL_OF_GUARDIAN || ip->Type == ITEM_PACKED_GEMSTONE
+        || ip->Type == ITEM_PACKED_JEWEL_OF_HARMONY || ip->Type == ITEM_PACKED_JEWEL_OF_CHAOS
+        || ip->Type == ITEM_PACKED_LOWER_REFINE_STONE || ip->Type == ITEM_PACKED_HIGHER_REFINE_STONE)
+    {
+        if (ip->Durability > 1)
+        {
+            mu_swprintf(TextList[TextNum], L"%d combined", ip->Durability);
+            TextListColor[TextNum] = TEXT_COLOR_WHITE; TextBold[TextNum] = false; TextNum++;
+        }
+    }
+    else if (tCount > 0)
     {
         int	nJewelIndex = COMGEM::Check_Jewel_Com(ip->Type);
         if (nJewelIndex != COMGEM::NOGEM)
@@ -4211,6 +4238,13 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
             mu_swprintf(TextList[TextNum], I18N::Game::CanBeUsedAfterDismantling);
             TextListColor[TextNum] = TEXT_COLOR_WHITE; TextBold[TextNum] = false; TextNum++;
         }
+    }
+    if (ip->Type == ITEM_PACKED_BLESS_OF_LIGHT)
+    {
+        mu_swprintf(TextList[TextNum], L"EXP Gain increase 100%%");
+        TextListColor[TextNum] = TEXT_COLOR_BLUE;
+        TextBold[TextNum] = false;
+        TextNum++;
     }
     if (ip->Type == ITEM_JEWEL_OF_BLESS)
     {
@@ -8702,6 +8736,20 @@ void RenderObjectScreen(int Type, int ItemLevel, int excellentFlags, int ancient
         Vector(270.f, -10.f, 0.f, ObjectSelect.Angle);
     }
 
+    if (Type == MODEL_BLESS_OF_LIGHT)
+    {
+        Position[0] += 0.01f;
+        Position[1] += 0.06f;
+        Vector(90.f, 0.f, 0.f, ObjectSelect.Angle);
+    }
+
+    if (Type == MODEL_PACKED_BLESS_OF_LIGHT)
+    {
+        Position[0] += 0.01f;
+        Position[1] += 0.01f;
+        Vector(90.f, 0.f, 0.f, ObjectSelect.Angle);
+    }
+
     if (Type >= MODEL_SEED_FIRE && Type <= MODEL_SEED_EARTH)
     {
         Vector(10.f, -10.f, 10.f, ObjectSelect.Angle);
@@ -9833,6 +9881,11 @@ void RenderObjectScreen(int Type, int ItemLevel, int excellentFlags, int ancient
                             {
                                 Scale = 0.0025f;
                             }
+
+        if (Type == MODEL_BLESS_OF_LIGHT || Type == MODEL_PACKED_BLESS_OF_LIGHT)
+        {
+            Scale = 0.0008f;
+        }
 
         if (Type >= static_cast<int>(MODEL_TYPE_CHARM_MIXWING) + EWS_BEGIN
             && Type <= static_cast<int>(MODEL_TYPE_CHARM_MIXWING) + EWS_END)

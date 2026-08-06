@@ -428,6 +428,16 @@ void PacketFunctions_ClientToServer::SendLahapJewelMixRequest(MixType operation,
     dotnet_SendLahapJewelMixRequest(this->GetHandle(), operation, item, mixingStackSize, unmixingSourceSlot);
 }
 
+void PacketFunctions_ClientToServer::SendBundleInventoryRequest()
+{
+    dotnet_SendBundleInventoryRequest(this->GetHandle());
+}
+
+void PacketFunctions_ClientToServer::SendDivideItemRequest(BYTE sourceSlot, BYTE amount)
+{
+    dotnet_SendDivideItemRequest(this->GetHandle(), sourceSlot, amount);
+}
+
 void PacketFunctions_ClientToServer::SendPartyListRequest()
 {
     dotnet_SendPartyListRequest(this->GetHandle());

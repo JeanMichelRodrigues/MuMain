@@ -13,6 +13,7 @@
 #include "Network/Server/SocketSystem.h"
 #include "World/MapInfra/MapManager.h"
 #include "GameLogic/Items/MixMgr.h"
+#include "UI/NewUI/Dialogs/NewUICustomMessageBox.h"
 using namespace SEASON3B;
 
 SEASON3B::CNewUIPickedItem::CNewUIPickedItem()
@@ -178,6 +179,8 @@ void SEASON3B::CNewUIPickedItem::Render3D()
 }
 
 CNewUIPickedItem* SEASON3B::CNewUIInventoryCtrl::ms_pPickedItem = nullptr;
+bool SEASON3B::CNewUIInventoryCtrl::s_bDivideMode = false;
+int SEASON3B::CNewUIInventoryCtrl::s_iDivideItemIndex = -1;
 
 SEASON3B::CNewUIInventoryCtrl::CNewUIInventoryCtrl()
 {
@@ -871,6 +874,38 @@ int SEASON3B::CNewUIInventoryCtrl::GetEmptySlotCount()
     return iResult;
 }
 
+namespace
+{
+    bool IsPackedJewelItem(short type)
+    {
+        return type == ITEM_PACKED_JEWEL_OF_BLESS
+            || type == ITEM_PACKED_JEWEL_OF_SOUL
+            || type == ITEM_PACKED_JEWEL_OF_LIFE
+            || type == ITEM_PACKED_JEWEL_OF_CREATION
+            || type == ITEM_PACKED_JEWEL_OF_GUARDIAN
+            || type == ITEM_PACKED_GEMSTONE
+            || type == ITEM_PACKED_JEWEL_OF_HARMONY
+            || type == ITEM_PACKED_JEWEL_OF_CHAOS
+            || type == ITEM_PACKED_LOWER_REFINE_STONE
+            || type == ITEM_PACKED_HIGHER_REFINE_STONE;
+    }
+
+    bool IsDivisibleItem(const ITEM* pItem)
+    {
+        if (pItem == nullptr)
+        {
+            return false;
+        }
+
+        if (pItem->Type == ITEM_PACKED_BLESS_OF_LIGHT || IsPackedJewelItem(pItem->Type))
+        {
+            return pItem->Durability > 1;
+        }
+
+        return false;
+    }
+}
+
 bool SEASON3B::CNewUIInventoryCtrl::UpdateMouseEvent()
 {
     if (m_EventState == EVENT_NONE
@@ -889,6 +924,16 @@ bool SEASON3B::CNewUIInventoryCtrl::UpdateMouseEvent()
     {
         m_EventState = EVENT_PICKING;
         ITEM* pItem = this->FindItem(m_iPointedSquareIndex);
+        if (s_bDivideMode)
+        {
+            s_bDivideMode = false;
+            if (IsDivisibleItem(pItem))
+            {
+                s_iDivideItemIndex = m_iPointedSquareIndex;
+                SEASON3B::CreateMessageBox(MSGBOX_LAYOUT_CLASS(SEASON3B::CDivideItemMsgBoxLayout));
+            }
+            return false;
+        }
         if (pItem)
         {
             if (CreatePickedItem(this, pItem))
@@ -1459,6 +1504,14 @@ void SEASON3B::CNewUIInventoryCtrl::RenderNumberOfItem()
         {
             glColor3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
+        }
+        else if (pItem->Type == ITEM_PACKED_BLESS_OF_LIGHT || IsPackedJewelItem(pItem->Type))
+        {
+            if (pItem->Durability > 1)
+            {
+                glColor3f(1.f, 0.9f, 0.7f);
+                SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
+            }
         }
         else if (pItem->Type >= ITEM_JACK_OLANTERN_BLESSINGS && pItem->Type <= ITEM_JACK_OLANTERN_DRINK && pItem->Durability > 1)
         {

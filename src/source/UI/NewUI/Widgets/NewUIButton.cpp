@@ -140,7 +140,7 @@ bool CNewUIBaseButton::Process()
 // CNewUIButton
 //////////////////////////////////////////////////////////////////////
 CNewUIButton::CNewUIButton() : CNewUIBaseButton(), m_CurImgIndex(0),
-m_CurImgState(0), m_ImgWidth(0), m_ImgHeight(0),
+m_CurImgState(0), m_ImgWidth(0), m_ImgHeight(0), m_CropSize{0, 0},
 m_NameColor(0xFFFFFFFF), m_NameBackColor(0x00000000),
 m_CurImgColor(0xFFFFFFFF), m_TooltipTextColor(0xFFFFFFFF), m_IsTopPos(false),
 #ifndef KJH_MOD_RADIOBTN_MOUSE_OVER_IMAGE			// #ifndef
@@ -285,6 +285,16 @@ void SEASON3B::CNewUIButton::ChangeButtonInfo(int x, int y, int sx, int sy)
 {
     SetPos(x, y);
     SetSize(sx, sy);
+    m_CropSize.x = sx;
+    m_CropSize.y = sy;
+}
+
+void SEASON3B::CNewUIButton::ChangeButtonInfo(int x, int y, int sx, int sy, int cropSx, int cropSy)
+{
+    SetPos(x, y);
+    SetSize(sx, sy);
+    m_CropSize.x = cropSx;
+    m_CropSize.y = cropSy;
 }
 
 void SEASON3B::CNewUIButton::RegisterButtonState(BUTTON_STATE eventstate, int imgindex, int btstate)
@@ -447,11 +457,13 @@ bool SEASON3B::CNewUIButton::Render(bool RendOption)
 #else // KJH_ADD_INGAMESHOP_UI_SYSTEM
         if (m_IsImgWidth)
         {
-            RenderImage(m_CurImgIndex, m_Pos.x, m_Pos.y, m_Size.x, m_Size.y, m_CurImgState * m_Size.x, 0.0f, m_CurImgColor);
+            RenderImageStretch(m_CurImgIndex, (float)m_Pos.x, (float)m_Pos.y, (float)m_Size.x, (float)m_Size.y,
+                (float)(m_CurImgState * m_CropSize.x), 0.0f, (float)m_CropSize.x, (float)m_CropSize.y, m_CurImgColor);
         }
         else
         {
-            RenderImage(m_CurImgIndex, m_Pos.x, m_Pos.y, m_Size.x, m_Size.y, 0.0f, m_CurImgState * m_Size.y, m_CurImgColor);
+            RenderImageStretch(m_CurImgIndex, (float)m_Pos.x, (float)m_Pos.y, (float)m_Size.x, (float)m_Size.y,
+                0.0f, (float)(m_CurImgState * m_CropSize.y), (float)m_CropSize.x, (float)m_CropSize.y, m_CurImgColor);
         }
 #endif // KJH_ADD_INGAMESHOP_UI_SYSTEM
     }

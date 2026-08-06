@@ -25,6 +25,7 @@ namespace SEASON3B
             IMAGE_EXTENSION_NO2,
             IMAGE_EXTENSION_NO3,
             IMAGE_EXTENSION_NO4,
+            IMAGE_BUNDLE_BTN,
         };
 
     private:
@@ -38,6 +39,7 @@ namespace SEASON3B
         POINT m_Pos;
 
         CNewUIButton m_BtnExit;
+        CNewUIButton m_BtnBundle;
     protected:
         void SetButtonInfo();
     public:

@@ -487,7 +487,13 @@ bool CNewUIInventoryActionController::ApplyJewels(CNewUIInventoryCtrl* targetCon
         || pPickItem->Type == ITEM_LOWER_REFINE_STONE
         || pPickItem->Type == ITEM_HIGHER_REFINE_STONE
         || pPickItem->Type == ITEM_POTION + 160
-        || pPickItem->Type == ITEM_POTION + 161;
+        || pPickItem->Type == ITEM_POTION + 161
+        || pPickItem->Type == ITEM_PACKED_JEWEL_OF_BLESS
+        || pPickItem->Type == ITEM_PACKED_JEWEL_OF_SOUL
+        || pPickItem->Type == ITEM_PACKED_JEWEL_OF_LIFE
+        || pPickItem->Type == ITEM_PACKED_JEWEL_OF_HARMONY
+        || pPickItem->Type == ITEM_PACKED_LOWER_REFINE_STONE
+        || pPickItem->Type == ITEM_PACKED_HIGHER_REFINE_STONE;
 
     if (!bIsJewelType)
     {
@@ -521,13 +527,13 @@ bool CNewUIInventoryActionController::ApplyJewels(CNewUIInventoryCtrl* targetCon
         bSuccess = false;
     }
 
-    if ((pPickItem->Type == ITEM_JEWEL_OF_BLESS && iLevel >= 6)
-        || (pPickItem->Type == ITEM_JEWEL_OF_SOUL && iLevel >= 9))
+    if (((pPickItem->Type == ITEM_JEWEL_OF_BLESS || pPickItem->Type == ITEM_PACKED_JEWEL_OF_BLESS) && iLevel >= 6)
+        || ((pPickItem->Type == ITEM_JEWEL_OF_SOUL || pPickItem->Type == ITEM_PACKED_JEWEL_OF_SOUL) && iLevel >= 9))
     {
         bSuccess = false;
     }
 
-    if (pPickItem->Type == ITEM_JEWEL_OF_BLESS
+    if ((pPickItem->Type == ITEM_JEWEL_OF_BLESS || pPickItem->Type == ITEM_PACKED_JEWEL_OF_BLESS)
         && iType == ITEM_HORN_OF_FENRIR
         && iDurability != 255)
     {
@@ -542,7 +548,7 @@ bool CNewUIInventoryActionController::ApplyJewels(CNewUIInventoryCtrl* targetCon
         return true;
     }
 
-    if (pPickItem->Type == ITEM_JEWEL_OF_HARMONY)
+    if (pPickItem->Type == ITEM_JEWEL_OF_HARMONY || pPickItem->Type == ITEM_PACKED_JEWEL_OF_HARMONY)
     {
         if (g_SocketItemMgr.IsSocketItem(pItem))
         {
@@ -565,7 +571,9 @@ bool CNewUIInventoryActionController::ApplyJewels(CNewUIInventoryCtrl* targetCon
     }
 
     if (pPickItem->Type == ITEM_LOWER_REFINE_STONE
-        || pPickItem->Type == ITEM_HIGHER_REFINE_STONE)
+        || pPickItem->Type == ITEM_HIGHER_REFINE_STONE
+        || pPickItem->Type == ITEM_PACKED_LOWER_REFINE_STONE
+        || pPickItem->Type == ITEM_PACKED_HIGHER_REFINE_STONE)
     {
         if (g_SocketItemMgr.IsSocketItem(pItem))
         {
@@ -595,6 +603,31 @@ bool CNewUIInventoryActionController::ApplyJewels(CNewUIInventoryCtrl* targetCon
         const int targetIndex = targetControl->GetIndexByItem(pItem);
         SendRequestUse(iSourceIndex, targetIndex);
         PlayBuffer(SOUND_GET_ITEM01);
+
+        const bool bIsPackedStack =
+            (pPickItem->Type == ITEM_PACKED_JEWEL_OF_BLESS
+                || pPickItem->Type == ITEM_PACKED_JEWEL_OF_SOUL
+                || pPickItem->Type == ITEM_PACKED_JEWEL_OF_LIFE
+                || pPickItem->Type == ITEM_PACKED_JEWEL_OF_HARMONY
+                || pPickItem->Type == ITEM_PACKED_LOWER_REFINE_STONE
+                || pPickItem->Type == ITEM_PACKED_HIGHER_REFINE_STONE)
+            && pPickItem->Durability > 1;
+
+        if (bIsPackedStack)
+        {
+            // Unlike a single-unit jewel, a packed stack isn't fully consumed by one
+            // application - only 1 unit was used server-side. Put the remainder back
+            // into its original slot instead of discarding the picked item entirely.
+            pPickItem->Durability -= 1;
+            if (CNewUIInventoryCtrl* pOwner = pPickedItem->GetOwnerInventory())
+            {
+                if (pOwner->AddItem(pPickItem->x, pPickItem->y, pPickItem))
+                {
+                    CNewUIInventoryCtrl::DeletePickedItem();
+                }
+            }
+        }
+
         return true;
     }
 
@@ -646,7 +679,9 @@ bool CNewUIInventoryActionController::TryConsumeItem(CNewUIInventoryCtrl* target
         || (pItem->Type >= ITEM_POTION + 97 && pItem->Type <= ITEM_POTION + 98)
         || pItem->Type == ITEM_HELPER + 81
         || pItem->Type == ITEM_HELPER + 82
-        || pItem->Type == ITEM_POTION + 133)
+        || pItem->Type == ITEM_POTION + 133
+        || pItem->Type == ITEM_BLESS_OF_LIGHT
+        || pItem->Type == ITEM_PACKED_BLESS_OF_LIGHT)
     {
         SendRequestUse(iIndex, 0);
         if (isApple)

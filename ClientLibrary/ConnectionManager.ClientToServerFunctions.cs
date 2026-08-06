@@ -2937,6 +2937,73 @@ public unsafe partial class ConnectionManager
     }
 
     /// <summary>
+    /// Sends a <see cref="BundleInventoryRequest" /> to this connection.
+    /// </summary>
+    /// <param name="handle">The handle of the connection.</param>
+    /// <remarks>
+    /// Is sent by the client when: When a player clicks the 'Bundle' button in the inventory window to automatically combine stackable items (jewels, Bless of Light, ...) into their packed form.
+    /// Causes reaction on server side: All eligible items in the inventory are combined into the largest possible packed stacks; the inventory is updated accordingly.
+    /// </remarks>
+    [UnmanagedCallersOnly(EntryPoint = "SendBundleInventoryRequest")]
+    public static void SendBundleInventoryRequest(int handle)
+    {
+        if (!Connections.TryGetValue(handle, out var connection))
+        {
+            return;
+        }
+
+        try
+        {
+            connection.CreateAndSend(pipeWriter =>
+            {
+                var length = BundleInventoryRequestRef.Length;
+                var packet = new BundleInventoryRequestRef(pipeWriter.GetSpan(length)[..length]);
+                return length;
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+        }
+    }
+
+    /// <summary>
+    /// Sends a <see cref="DivideItemRequest" /> to this connection.
+    /// </summary>
+    /// <param name="handle">The handle of the connection.</param>
+    /// <param name="sourceSlot">The source slot.</param>
+    /// <param name="amount">The amount.</param>
+    /// <remarks>
+    /// Is sent by the client when: When a player clicks the 'Divide' button and then selects a stackable item and a quantity to split off into a new stack.
+    /// Causes reaction on server side: If the source item has enough units, a new item is created in a free slot with the requested amount, and the source item's amount is reduced accordingly.
+    /// </remarks>
+    [UnmanagedCallersOnly(EntryPoint = "SendDivideItemRequest")]
+    public static void SendDivideItemRequest(int handle, byte @sourceSlot, byte @amount)
+    {
+        if (!Connections.TryGetValue(handle, out var connection))
+        {
+            return;
+        }
+
+        try
+        {
+            connection.CreateAndSend(pipeWriter =>
+            {
+                var length = DivideItemRequestRef.Length;
+                var packet = new DivideItemRequestRef(pipeWriter.GetSpan(length)[..length]);
+                packet.SourceSlot = @sourceSlot;
+                packet.Amount = @amount;
+
+                return length;
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+        }
+    }
+
+    /// <summary>
     /// Sends a <see cref="PartyListRequest" /> to this connection.
     /// </summary>
     /// <param name="handle">The handle of the connection.</param>

@@ -926,6 +926,26 @@ public:
     void SendLahapJewelMixRequest(MixType operation, ItemType item, StackSize mixingStackSize, BYTE unmixingSourceSlot);
 
     /// <summary>
+    /// Sends a BundleInventoryRequest to this connection.
+    /// </summary>
+    /// <remarks>
+    /// Is sent by the client when: When a player clicks the 'Bundle' button in the inventory window to automatically combine stackable items (jewels, Bless of Light, ...) into their packed form.
+    /// Causes reaction on server side: All eligible items in the inventory are combined into the largest possible packed stacks; the inventory is updated accordingly.
+    /// </remarks>
+    void SendBundleInventoryRequest();
+
+    /// <summary>
+    /// Sends a DivideItemRequest to this connection.
+    /// </summary>
+    /// <param name="sourceSlot">The source slot.</param>
+    /// <param name="amount">The amount.</param>
+    /// <remarks>
+    /// Is sent by the client when: When a player clicks the 'Divide' button and then selects a stackable item and a quantity to split off into a new stack.
+    /// Causes reaction on server side: If the source item has enough units, a new item is created in a free slot with the requested amount, and the source item's amount is reduced accordingly.
+    /// </remarks>
+    void SendDivideItemRequest(BYTE sourceSlot, BYTE amount);
+
+    /// <summary>
     /// Sends a PartyListRequest to this connection.
     /// </summary>
     /// <remarks>

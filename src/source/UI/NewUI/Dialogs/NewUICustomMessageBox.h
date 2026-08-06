@@ -1021,6 +1021,17 @@ namespace SEASON3B
         static CALLBACK_RESULT ProcessOk(class CNewUIMessageBoxBase* pOwner);
     };
 
+    class CDivideItemMsgBoxLayout : public TMsgBoxLayout<CNewUITextInputMsgBox>
+    {
+    public:
+        bool SetLayout();
+        static CALLBACK_RESULT ReturnDown(class CNewUIMessageBoxBase* pOwner, const leaf::xstreambuf& xParam);
+        static CALLBACK_RESULT OkBtnDown(class CNewUIMessageBoxBase* pOwner, const leaf::xstreambuf& xParam);
+        static CALLBACK_RESULT CancelBtnDown(class CNewUIMessageBoxBase* pOwner, const leaf::xstreambuf& xParam);
+
+        static CALLBACK_RESULT ProcessOk(class CNewUIMessageBoxBase* pOwner);
+    };
+
     class CZenReceiptMsgBoxLayout : public TMsgBoxLayout<CNewUITextInputMsgBox>
     {
     public:

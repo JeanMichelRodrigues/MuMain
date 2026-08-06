@@ -266,6 +266,12 @@ inline SendJewelBankMoveRequest dotnet_SendJewelBankMoveRequest = reinterpret_ca
 typedef void(CORECLR_DELEGATE_CALLTYPE* SendLahapJewelMixRequest)(int32_t, MixType , ItemType , StackSize , BYTE );
 inline SendLahapJewelMixRequest dotnet_SendLahapJewelMixRequest = reinterpret_cast<SendLahapJewelMixRequest>(symLoad(munique_client_library_handle, "SendLahapJewelMixRequest"));
 
+typedef void(CORECLR_DELEGATE_CALLTYPE* SendBundleInventoryRequest)(int32_t);
+inline SendBundleInventoryRequest dotnet_SendBundleInventoryRequest = reinterpret_cast<SendBundleInventoryRequest>(symLoad(munique_client_library_handle, "SendBundleInventoryRequest"));
+
+typedef void(CORECLR_DELEGATE_CALLTYPE* SendDivideItemRequest)(int32_t, BYTE , BYTE );
+inline SendDivideItemRequest dotnet_SendDivideItemRequest = reinterpret_cast<SendDivideItemRequest>(symLoad(munique_client_library_handle, "SendDivideItemRequest"));
+
 typedef void(CORECLR_DELEGATE_CALLTYPE* SendPartyListRequest)(int32_t);
 inline SendPartyListRequest dotnet_SendPartyListRequest = reinterpret_cast<SendPartyListRequest>(symLoad(munique_client_library_handle, "SendPartyListRequest"));
 

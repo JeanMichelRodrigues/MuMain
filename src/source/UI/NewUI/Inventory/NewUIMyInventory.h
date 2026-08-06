@@ -49,6 +49,8 @@ namespace SEASON3B
             IMAGE_INVENTORY_EXIT_BTN, //"newui_exit_00.tga"
             IMAGE_INVENTORY_REPAIR_BTN, //"newui_repair_00.tga"
             IMAGE_INVENTORY_EXPAND_BTN, //"newui_expansion_btn.tga"
+            IMAGE_INVENTORY_BUNDLE_BTN,
+            IMAGE_INVENTORY_DIVIDE_BTN,
         };
 
         enum MYSHOP_MODE
@@ -87,6 +89,8 @@ namespace SEASON3B
         CNewUIButton m_BtnExit;
         CNewUIButton m_BtnMyShop;
         CNewUIButton m_BtnExpand;
+        CNewUIButton m_BtnBundle;
+        CNewUIButton m_BtnDivide;
 
         MYSHOP_MODE m_MyShopMode;
         SEASON3B::REPAIR_MODE m_RepairMode;

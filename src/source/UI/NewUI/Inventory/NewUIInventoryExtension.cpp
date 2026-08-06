@@ -85,6 +85,7 @@ void CNewUIInventoryExtension::SetPos(int x, int y)
     m_Pos.x = x;
     m_Pos.y = y;
     m_BtnExit.ChangeButtonInfo(m_Pos.x + 13, m_Pos.y + 391, 36, 29);
+    m_BtnBundle.ChangeButtonInfo(m_Pos.x + 50, m_Pos.y + 391, 36, 29);
 }
 
 bool CNewUIInventoryExtension::UpdateMouseEvent()
@@ -112,6 +113,12 @@ bool CNewUIInventoryExtension::UpdateMouseEvent()
     if (m_BtnExit.UpdateMouseEvent())
     {
         g_pNewUISystem->Hide(INTERFACE_INVENTORY_EXT);
+        return false;
+    }
+
+    if (m_BtnBundle.UpdateMouseEvent())
+    {
+        SocketClient->ToGameServer()->SendBundleInventoryRequest();
         return false;
     }
 
@@ -194,6 +201,7 @@ bool CNewUIInventoryExtension::Render()
     }
 
     m_BtnExit.Render();
+    m_BtnBundle.Render();
 
     DisableAlphaBlend();
     return true;
@@ -236,6 +244,9 @@ void CNewUIInventoryExtension::SetButtonInfo()
 {
     m_BtnExit.ChangeButtonImgState(true, IMAGE_INVENTORY_EXIT_BTN, false);
     m_BtnExit.ChangeToolTipText(&I18N::Game::Close388, true);
+
+    m_BtnBundle.ChangeButtonImgState(true, IMAGE_BUNDLE_BTN, false);
+    m_BtnBundle.ChangeToolTipText(L"Bundle", true);
 }
 
 void CNewUIInventoryExtension::LoadImages()
@@ -252,6 +263,7 @@ void CNewUIInventoryExtension::LoadImages()
     LoadBitmap(L"Interface\\newui_item_add_marking_no02.tga", IMAGE_EXTENSION_NO2, GL_LINEAR);
     LoadBitmap(L"Interface\\newui_item_add_marking_no03.tga", IMAGE_EXTENSION_NO3, GL_LINEAR);
     LoadBitmap(L"Interface\\newui_item_add_marking_no04.tga", IMAGE_EXTENSION_NO4, GL_LINEAR);
+    LoadBitmap(L"Interface\\newui_Bt_mix.tga", IMAGE_BUNDLE_BTN, GL_LINEAR);
 }
 
 void CNewUIInventoryExtension::UnloadImages()
@@ -268,6 +280,7 @@ void CNewUIInventoryExtension::UnloadImages()
     DeleteBitmap(IMAGE_EXTENSION_NO2);
     DeleteBitmap(IMAGE_EXTENSION_NO3);
     DeleteBitmap(IMAGE_EXTENSION_NO4);
+    DeleteBitmap(IMAGE_BUNDLE_BTN);
 }
 
 CNewUIInventoryCtrl* CNewUIInventoryExtension::TryGetExtensionByInventoryIndex(int iIndex) const

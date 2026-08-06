@@ -78,6 +78,9 @@ namespace SEASON3B
     class CNewUIInventoryCtrl : public INewUI3DRenderObj
     {
     public:
+        static bool s_bDivideMode;
+        static int s_iDivideItemIndex;
+
         enum EVENT_STATE
         {
             EVENT_NONE = 0,

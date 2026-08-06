@@ -15,6 +15,7 @@
 #include "Render/Textures/ZzzTexture.h"
 #include "Engine/AI/ZzzAI.h"
 #include "Engine/Object/ZzzInterface.h"
+#include "UI/NewUI/Inventory/NewUIInventoryCtrl.h"
 #include "UI/Chat/ChatInput.h"
 #include "GameLogic/Combat/ClassAttack.h"
 #include "GameLogic/Combat/SkillCast.h"
@@ -4019,6 +4020,13 @@ void RenderCursor()
     if (!g_bRenderGameCursor)
         return;
 
+    if (SEASON3B::CNewUIInventoryCtrl::s_bDivideMode
+        && !g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_INVENTORY)
+        && !g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_INVENTORY_EXT))
+    {
+        SEASON3B::CNewUIInventoryCtrl::s_bDivideMode = false;
+    }
+
     EnableAlphaTest();
     glColor3f(1.f, 1.f, 1.f);
 
@@ -4087,6 +4095,13 @@ void RenderCursor()
         {
             RenderBitmap(BITMAP_CURSOR + 1, (float)MouseX - 2.f, (float)MouseY - 2.f, 24.f, 24.f);
         }
+    }
+    else if (SEASON3B::CNewUIInventoryCtrl::s_bDivideMode
+        && (g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_INVENTORY) || g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_INVENTORY_EXT))
+        && SEASON3B::IsNone(VK_LBUTTON)
+        && SEASON3B::IsNone(VK_RBUTTON))
+    {
+        RenderBitmap(BITMAP_CURSOR + 3, (float)MouseX - 2.f, (float)MouseY - 2.f, 24.f, 24.f);
     }
     else if (((g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_INVENTORY) || g_pNewUISystem->IsVisible(SEASON3B::INTERFACE_INVENTORY_EXT))
         && g_pMyInventory->GetRepairMode() == SEASON3B::REPAIR_MODE_ON)

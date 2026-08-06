@@ -419,9 +419,11 @@ void CNewUIMyInventory::SetPos(int x, int y)
 
     m_pNewInventoryCtrl->SetPos(x + 15, y + 200);
     m_BtnExit.SetPos(m_Pos.x + 13, m_Pos.y + 391);
-    m_BtnRepair.SetPos(m_Pos.x + 50, m_Pos.y + 391);
-    m_BtnMyShop.SetPos(m_Pos.x + 87, m_Pos.y + 391);
-    m_BtnExpand.SetPos(m_Pos.x + 87 + 37, m_Pos.y + 391);
+    m_BtnRepair.SetPos(m_Pos.x + 40, m_Pos.y + 391);
+    m_BtnMyShop.SetPos(m_Pos.x + 67, m_Pos.y + 391);
+    m_BtnExpand.SetPos(m_Pos.x + 94, m_Pos.y + 391);
+    m_BtnBundle.SetPos(m_Pos.x + 121, m_Pos.y + 391);
+    m_BtnDivide.SetPos(m_Pos.x + 148, m_Pos.y + 391);
 }
 
 const POINT& CNewUIMyInventory::GetPos() const
@@ -843,6 +845,7 @@ void CNewUIMyInventory::ClosingProcess()
     m_pNewInventoryCtrl->BackupPickedItem();
     RepairEnable = 0;
     SetRepairMode(false);
+    CNewUIInventoryCtrl::s_bDivideMode = false;
 }
 
 float CNewUIMyInventory::GetLayerDepth()
@@ -1188,21 +1191,32 @@ void CNewUIMyInventory::SetEquipmentSlotInfo()
 
 void CNewUIMyInventory::SetButtonInfo()
 {
+    // All 6 buttons share a single row now. Draw size (25x20) is smaller
+    // than the native 36x29 icon art (crop size, last two args), so
+    // RenderImageStretch scales each icon down cleanly instead of cropping it.
     m_BtnExit.ChangeButtonImgState(true, IMAGE_INVENTORY_EXIT_BTN, false);
-    m_BtnExit.ChangeButtonInfo(m_Pos.x + 13, m_Pos.y + 391, 36, 29);
+    m_BtnExit.ChangeButtonInfo(m_Pos.x + 13, m_Pos.y + 391, 25, 20, 36, 29);
     m_BtnExit.ChangeToolTipText(&I18N::Game::CloseIV, true);
 
     m_BtnRepair.ChangeButtonImgState(true, IMAGE_INVENTORY_REPAIR_BTN, false);
-    m_BtnRepair.ChangeButtonInfo(m_Pos.x + 50, m_Pos.y + 391, 36, 29);
+    m_BtnRepair.ChangeButtonInfo(m_Pos.x + 40, m_Pos.y + 391, 25, 20, 36, 29);
     m_BtnRepair.ChangeToolTipText(&I18N::Game::RepairL, true);
 
     m_BtnMyShop.ChangeButtonImgState(true, IMAGE_INVENTORY_MYSHOP_OPEN_BTN, false);
-    m_BtnMyShop.ChangeButtonInfo(m_Pos.x + 87, m_Pos.y + 391, 36, 29);
+    m_BtnMyShop.ChangeButtonInfo(m_Pos.x + 67, m_Pos.y + 391, 25, 20, 36, 29);
     m_BtnMyShop.ChangeToolTipText(&I18N::Game::OpenPersonalStoreS, true);
 
     m_BtnExpand.ChangeButtonImgState(true, IMAGE_INVENTORY_EXPAND_BTN, false);
-    m_BtnExpand.ChangeButtonInfo(m_Pos.x + 87 + 37, m_Pos.y + 391, 36, 29);
+    m_BtnExpand.ChangeButtonInfo(m_Pos.x + 94, m_Pos.y + 391, 25, 20, 36, 29);
     m_BtnExpand.ChangeToolTipText(&I18N::Game::OpenExpandedInventoryK, true);
+
+    m_BtnBundle.ChangeButtonImgState(true, IMAGE_INVENTORY_BUNDLE_BTN, false);
+    m_BtnBundle.ChangeButtonInfo(m_Pos.x + 121, m_Pos.y + 391, 25, 20, 36, 29);
+    m_BtnBundle.ChangeToolTipText(L"Bundle", true);
+
+    m_BtnDivide.ChangeButtonImgState(true, IMAGE_INVENTORY_DIVIDE_BTN, false);
+    m_BtnDivide.ChangeButtonInfo(m_Pos.x + 148, m_Pos.y + 391, 25, 20, 36, 29);
+    m_BtnDivide.ChangeToolTipText(L"Divide", true);
 }
 
 void CNewUIMyInventory::LoadImages() const
@@ -1228,6 +1242,8 @@ void CNewUIMyInventory::LoadImages() const
     LoadBitmap(L"Interface\\newui_exit_00.tga", IMAGE_INVENTORY_EXIT_BTN, GL_LINEAR);
     LoadBitmap(L"Interface\\newui_repair_00.tga", IMAGE_INVENTORY_REPAIR_BTN, GL_LINEAR);
     LoadBitmap(L"Interface\\newui_expansion_btn.tga", IMAGE_INVENTORY_EXPAND_BTN, GL_LINEAR);
+    LoadBitmap(L"Interface\\newui_Bt_mix.tga", IMAGE_INVENTORY_BUNDLE_BTN, GL_LINEAR);
+    LoadBitmap(L"Interface\\newui_Bt_money01.tga", IMAGE_INVENTORY_DIVIDE_BTN, GL_LINEAR);
     LoadBitmap(L"Interface\\newui_Bt_openshop.tga", IMAGE_INVENTORY_MYSHOP_OPEN_BTN, GL_LINEAR);
     LoadBitmap(L"Interface\\newui_Bt_closeshop.tga", IMAGE_INVENTORY_MYSHOP_CLOSE_BTN, GL_LINEAR);
 }
@@ -1257,6 +1273,8 @@ void CNewUIMyInventory::UnloadImages()
     DeleteBitmap(IMAGE_INVENTORY_BACK_TOP);
     DeleteBitmap(IMAGE_INVENTORY_BACK);
     DeleteBitmap(IMAGE_INVENTORY_EXPAND_BTN);
+    DeleteBitmap(IMAGE_INVENTORY_BUNDLE_BTN);
+    DeleteBitmap(IMAGE_INVENTORY_DIVIDE_BTN);
 }
 
 void CNewUIMyInventory::RenderFrame() const
@@ -1266,8 +1284,10 @@ void CNewUIMyInventory::RenderFrame() const
 
     RenderImage(IMAGE_INVENTORY_BACK, x, y, INVENTORY_WIDTH, INVENTORY_HEIGHT);
     RenderImage(IMAGE_INVENTORY_BACK_TOP2, x, y, 190.f, 64.f);
-    RenderImage(IMAGE_INVENTORY_BACK_LEFT, x, y + 64, 21.f, 320.f);
-    RenderImage(IMAGE_INVENTORY_BACK_RIGHT, x + INVENTORY_WIDTH - 21, y + 64, 21.f, 320.f);
+    // 64 (top) + side height + 45 (bottom) must add up to INVENTORY_HEIGHT so
+    // the side borders reach the bottom cap with no gap.
+    RenderImage(IMAGE_INVENTORY_BACK_LEFT, x, y + 64, 21.f, INVENTORY_HEIGHT - 64 - 45);
+    RenderImage(IMAGE_INVENTORY_BACK_RIGHT, x + INVENTORY_WIDTH - 21, y + 64, 21.f, INVENTORY_HEIGHT - 64 - 45);
     RenderImage(IMAGE_INVENTORY_BACK_BOTTOM, x, y + INVENTORY_HEIGHT - 45, 190.f, 45.f);
 }
 
@@ -1375,6 +1395,8 @@ void CNewUIMyInventory::RenderButtons()
     }
     m_BtnExit.Render();
     m_BtnExpand.Render();
+    m_BtnBundle.Render();
+    m_BtnDivide.Render();
 
     DisableAlphaBlend();
 }
@@ -1459,6 +1481,12 @@ bool CNewUIMyInventory::EquipmentWindowProcess()
         }
         else // pPickedItem == NULL
         {
+            if (CNewUIInventoryCtrl::s_bDivideMode)
+            {
+                CNewUIInventoryCtrl::s_bDivideMode = false;
+                return true;
+            }
+
             if (GetRepairMode() == REPAIR_MODE_ON)
             {
                 ITEM* pEquippedItem = &CharacterMachine->Equipment[m_iPointedSlot];
@@ -1596,6 +1624,18 @@ bool CNewUIMyInventory::BtnProcess()
     if (m_BtnExpand.UpdateMouseEvent())
     {
         g_pNewUISystem->Toggle(INTERFACE_INVENTORY_EXT);
+        return true;
+    }
+
+    if (m_BtnBundle.UpdateMouseEvent())
+    {
+        SocketClient->ToGameServer()->SendBundleInventoryRequest();
+        return true;
+    }
+
+    if (m_BtnDivide.UpdateMouseEvent())
+    {
+        CNewUIInventoryCtrl::s_bDivideMode = true;
         return true;
     }
 

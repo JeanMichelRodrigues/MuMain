@@ -1051,6 +1051,8 @@ void OpenItems()
     gLoadData.AccessModel(MODEL_WING + 20, L"Data\\Item\\", L"Gem", 14);
 
     gLoadData.AccessModel(MODEL_CRYSTAL_OF_DESTRUCTION, L"Data\\Item\\", L"Gem", 6);
+    gLoadData.AccessModel(MODEL_BLESS_OF_LIGHT, L"Data\\Item\\partCharge2\\", L"sealmove");
+    gLoadData.AccessModel(MODEL_PACKED_BLESS_OF_LIGHT, L"Data\\Item\\partCharge2\\", L"sealmove");
 
     gLoadData.AccessModel(MODEL_CRYSTAL_OF_MULTI_SHOT, L"Data\\Item\\", L"Gem", 6);
 
@@ -1381,6 +1383,8 @@ void OpenItemTextures()
     gLoadData.OpenTexture(MODEL_SCROLL_OF_CHAOTIC_DISEIER, L"Item\\");
     gLoadData.OpenTexture(MODEL_SCROLL_OF_FIRE_SCREAM, L"Item\\");
     gLoadData.OpenTexture(MODEL_CRYSTAL_OF_DESTRUCTION, L"Item\\");
+    gLoadData.OpenTexture(MODEL_BLESS_OF_LIGHT, L"Item\\partCharge2\\");
+    gLoadData.OpenTexture(MODEL_PACKED_BLESS_OF_LIGHT, L"Item\\partCharge2\\");
     gLoadData.OpenTexture(MODEL_CRYSTAL_OF_MULTI_SHOT, L"Item\\");
     gLoadData.OpenTexture(MODEL_CRYSTAL_OF_RECOVERY, L"Item\\");
     gLoadData.OpenTexture(MODEL_CRYSTAL_OF_FLAME_STRIKE, L"Item\\");

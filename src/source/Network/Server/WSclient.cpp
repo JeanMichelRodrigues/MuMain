@@ -14857,6 +14857,7 @@ void InsertBuffLogicalEffect(eBuffState buff, OBJECT* o, const int bufftime)
         case eBuff_AG_Addition:
         case eBuff_SD_Addition:
         case eBuff_PartyExpBonus:
+        case eBuff_BlessOfLight:
         {
             g_RegisterBuffTime(buff, bufftime);
         }
@@ -15045,6 +15046,7 @@ void ClearBuffLogicalEffect(eBuffState buff, OBJECT* o)
         case eBuff_AG_Addition:
         case eBuff_SD_Addition:
         case eBuff_PartyExpBonus:
+        case eBuff_BlessOfLight:
         {
             g_UnRegisterBuffTime(buff);
         }

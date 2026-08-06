@@ -126,6 +126,10 @@ namespace SEASON3B
             bool overflg = false, bool isimgwidth = false);
 #endif // KJH_ADD_INGAMESHOP_UI_SYSTEM
         void ChangeButtonInfo(int x, int y, int sx, int sy);
+        // Draws the icon scaled to (sx,sy) while sampling a (cropSx,cropSy)
+        // region from the source texture, instead of forcing the crop to
+        // match the draw size (which just truncates the icon when shrunk).
+        void ChangeButtonInfo(int x, int y, int sx, int sy, int cropSx, int cropSy);
 
     private:
         void Initialize();
@@ -199,6 +203,8 @@ namespace SEASON3B
 
         WORD					m_ImgWidth;
         WORD					m_ImgHeight;
+
+        POINT					m_CropSize;
 
         unsigned int			m_CurImgColor;
         bool					m_IsTopPos;
